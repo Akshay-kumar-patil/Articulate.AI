@@ -1,0 +1,37 @@
+# FastAPI Backend
+fastapi
+uvicorn
+
+# MongoDB
+pymongo
+
+# Environment Variables
+python-dotenv
+
+# Password Hashing
+bcrypt
+
+
+# Request Validation
+pydantic
+email-validator
+
+# Resume Parsing
+pymupdf
+
+# Groq API
+groq
+
+# File Uploads
+python-multipart
+
+# Streamlit Frontend
+streamlit
+
+# HTTP Requests (Frontend -> Backend)
+requests
+
+# Audio Recording (for Streamlit)
+streamlit-mic-recorder
+
+
