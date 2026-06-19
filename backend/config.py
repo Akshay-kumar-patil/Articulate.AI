@@ -2,22 +2,22 @@ import os
 from dotenv import load_dotenv
 from pymongo import MongoClient
 
+
 load_dotenv()
 
 
 class Config:
-    GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+    # Groq API Configuration
+    GROQ_API_KEY = os.getenv("GROQ_API_KEY")
     GROQ_MODEL_NAME = "llama-3.3-70b-versatile"
 
-    MONGO_URI = os.environ.get("MONGO_URI")
-    DB_NAME = "Articulate.Ai"
+    # MongoDB Configuration
+    MONGO_URI = os.getenv("MONGO_URI")
+    DB_NAME = "Articulate"
 
-    SECRET_KEY = os.environ.get("SECRET_KEY")
+    # Secret key for security-related features
+    SECRET_KEY = os.getenv("SECRET_KEY")
 
-
-# -----------------------------
-# MongoDB Connection
-# -----------------------------
 
 
 client = MongoClient(Config.MONGO_URI)
