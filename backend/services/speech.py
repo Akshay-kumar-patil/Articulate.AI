@@ -9,4 +9,4 @@ def transcribe_audio(file_path: str) -> str:
             file=audio_file,
             model="whisper-large-v3"
         )
-    return transcription.text
+    return transcription.text                                                                           
