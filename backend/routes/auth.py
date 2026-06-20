@@ -18,10 +18,7 @@ class LoginRequest(BaseModel):
 
 @router.post("/signup")
 def signup(user: SignupRequest):
-    existing_user = users_collection.find_one
-    (
-        {"email": user.email}
-    )
+    existing_user = users_collection.find_one({"email": user.email})
 
     if existing_user:
         raise HTTPException(
