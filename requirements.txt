@@ -34,4 +34,5 @@ requests
 # Audio Recording (for Streamlit)
 streamlit-mic-recorder
 
-
+# Langchain
+langchain_community
