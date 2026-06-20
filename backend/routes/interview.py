@@ -4,6 +4,7 @@ from fastapi import APIRouter,UploadFile, File
 from pydantic import BaseModel
 from backend.services.question_gen import generate_questions
 from backend.services.speech import transcribe_audio
+from backend.services.scorer import score_answer
 
 router=APIRouter()
 
@@ -34,3 +35,15 @@ def answer_audio(file:UploadFile=File(...)):
         "preview": data[:300],
         "text": data
     }
+
+
+class ScoreRequest(BaseModel):
+    question: str
+    answer: str
+    is_intro_question : bool
+
+
+@router.post("/score-answer")
+def get_score(score:ScoreRequest):
+    scores=score_answer(score.question,score.answer,score.is_intro_question)
+    return scores
