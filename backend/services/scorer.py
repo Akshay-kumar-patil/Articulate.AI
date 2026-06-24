@@ -1,5 +1,6 @@
 import json
 from groq import Groq
+import re
 from backend.config import Config
 
 client = Groq(api_key=Config.GROQ_API_KEY)
@@ -30,5 +31,7 @@ Return ONLY valid JSON in this exact format, nothing else:
         temperature=0,
         max_tokens=300
     )
-
-    return json.loads(response.choices[0].message.content)
+    raw = response.choices[0].message.content
+    raw = re.sub(r"```json|```", "", raw).strip()
+    print("GROQ RAW RESPONSE:", repr(raw))
+    return json.loads(raw)
