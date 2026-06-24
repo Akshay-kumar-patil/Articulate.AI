@@ -36,3 +36,7 @@ streamlit-mic-recorder
 
 # Langchain
 langchain_community
+
+# for text to speech
+pyttsx3   # this speaks on backend
+gtts # this is used for the frontend to speak
