@@ -1,6 +1,7 @@
 from backend.routes.auth import router as auth_router
 from backend.routes.resume import router  as resume_router
 from backend.routes.interview import router  as question_router
+from backend.routes.analytics import router as analytics_router
 from fastapi import FastAPI
 
 app = FastAPI(
@@ -26,4 +27,10 @@ app.include_router(
     question_router,
     prefix="/question",
     tags=["question"]
+)
+
+app.include_router(
+    analytics_router,
+    prefix="/analytics",
+    tags=["Analytics"]
 )
