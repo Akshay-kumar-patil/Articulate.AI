@@ -3,9 +3,17 @@ import requests
 from streamlit_mic_recorder import mic_recorder
 from gtts import gTTS
 import base64
+from streamlit_cookies_manager import EncryptedCookieManager
 import io
 
 API_URL = "http://127.0.0.1:8000"
+
+cookies = EncryptedCookieManager(prefix="articulate_", password="your_secret_key")
+if not cookies.ready():
+    st.stop()
+
+if "spoken_q" not in st.session_state:
+    st.session_state.spoken_q = -1
 
 def speak(text: str):
     tts = gTTS(text=text, lang="en")
@@ -22,7 +30,13 @@ def speak(text: str):
 
 # Initialize session state
 if "logged_in" not in st.session_state:
-    st.session_state.logged_in = False
+    saved_user_id = cookies.get("user_id")
+    if saved_user_id:
+        st.session_state.logged_in = True
+        st.session_state.user_id = saved_user_id
+    else:
+        st.session_state.logged_in = False
+
 if "user_id" not in st.session_state:
     st.session_state.user_id = None
 if "resume_info" not in st.session_state:
@@ -46,6 +60,8 @@ if not st.session_state.logged_in:
                 data = res.json()
                 st.session_state.logged_in = True
                 st.session_state.user_id = data["user_id"]
+                cookies["user_id"] = data["user_id"]
+                cookies.save()
                 st.rerun()
             else:
                 st.error("Invalid email or password")
@@ -68,6 +84,8 @@ else:
 
     # ---- LOGOUT + DELETE ACCOUNT ----
     if st.sidebar.button("🚪 Logout"):
+        cookies["user_id"] = ""
+        cookies.save()
         for key in list(st.session_state.keys()):
             del st.session_state[key]
         st.rerun()
@@ -135,7 +153,10 @@ else:
 
             st.subheader(f"Question {q_index + 1} of {len(st.session_state.questions)}")
             st.info(question_text)
-            speak(question_text)
+            if st.session_state.spoken_q != q_index:
+                st.session_state.spoken_q = q_index
+                speak(question_text)
+            st.empty()
 
             audio = mic_recorder(
                 start_prompt="🎙️ Start Recording",
