@@ -8,7 +8,7 @@ client = Groq(api_key=Config.GROQ_API_KEY)
 def score_answer(question: str, answer: str, is_intro_question: bool = False) -> dict:
     extra_field = ""
     if is_intro_question:
-        extra_field = '"confidence_score": 0-10,'
+        extra_field = '"confidence_score": 0,'
 
     prompt = f"""
 You are a strict technical interviewer evaluating one answer.
@@ -33,5 +33,6 @@ Return ONLY valid JSON in this exact format, nothing else:
     )
     raw = response.choices[0].message.content
     raw = re.sub(r"```json|```", "", raw).strip()
+    raw = re.sub(r",\s*}", "}", raw)
     print("GROQ RAW RESPONSE:", repr(raw))
     return json.loads(raw)
