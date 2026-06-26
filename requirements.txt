@@ -34,6 +34,9 @@ requests
 # Audio Recording (for Streamlit)
 streamlit-mic-recorder
 
+# for continues login for the particular user for that session
+streamlit-cookies-manager 
+
 # Langchain
 langchain_community
 
