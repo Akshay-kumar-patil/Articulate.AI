@@ -3,6 +3,7 @@ from pydantic import BaseModel, EmailStr
 from backend.auth.security import hash_password, verify_password
 from backend.db.models import users_collection
 from backend.auth.security import hash_password
+from bson import ObjectId
 
 router= APIRouter()
 
@@ -68,3 +69,19 @@ def login(user: LoginRequest):
         "username": db_user["username"],
         "email": db_user["email"]
     }
+
+@router.get("/verify/{user_id}")
+def verify_user(user_id: str):
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User exists"}
+
+
+@router.get("/verify/{user_id}")
+def verify_user(user_id: str):
+    from bson import ObjectId
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return {"message": "User exists"}
