@@ -32,8 +32,17 @@ def speak(text: str):
 if "logged_in" not in st.session_state:
     saved_user_id = cookies.get("user_id")
     if saved_user_id:
-        st.session_state.logged_in = True
-        st.session_state.user_id = saved_user_id
+        try:
+            verify = requests.get(f"{API_URL}/auth/verify/{saved_user_id}")
+            if verify.status_code == 200:
+                st.session_state.logged_in = True
+                st.session_state.user_id = saved_user_id
+            else:
+                cookies["user_id"] = ""
+                cookies.save()
+                st.session_state.logged_in = False
+        except:
+            st.session_state.logged_in = False
     else:
         st.session_state.logged_in = False
 
@@ -93,6 +102,8 @@ else:
     if st.sidebar.button("🗑️ Delete My Account"):
         del_res = requests.delete(f"{API_URL}/analytics/delete-user/{st.session_state.user_id}")
         if del_res.status_code == 200:
+            cookies["user_id"] = ""
+            cookies.save()
             st.sidebar.success("Account deleted permanently")
             for key in list(st.session_state.keys()):
                 del st.session_state[key]
