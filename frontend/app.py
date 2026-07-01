@@ -3,10 +3,12 @@ import requests
 from streamlit_mic_recorder import mic_recorder
 from gtts import gTTS
 import base64
+import os
 from streamlit_cookies_manager import EncryptedCookieManager
 import io
-
-API_URL = "http://127.0.0.1:8000"
+from dotenv import load_dotenv
+load_dotenv()
+API_URL = os.getenv("Backend_URL")
 
 cookies = EncryptedCookieManager(prefix="articulate_", password="your_secret_key")
 if not cookies.ready():
