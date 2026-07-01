@@ -6,9 +6,7 @@ import base64
 import os
 from streamlit_cookies_manager import EncryptedCookieManager
 import io
-from dotenv import load_dotenv
-load_dotenv()
-API_URL = os.getenv("Backend_URL")
+API_URL = st.secrets["Backend_URL"]
 
 cookies = EncryptedCookieManager(prefix="articulate_", password="your_secret_key")
 if not cookies.ready():
