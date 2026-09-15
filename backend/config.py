@@ -9,7 +9,7 @@ load_dotenv()
 class Config:
     # Groq API Configuration
     GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-    GROQ_MODEL_NAME = "llama-3.3-70b-versatile"
+    GROQ_MODEL_NAME = "openai/gpt-oss-120b"
 
     # MongoDB Configuration
     MONGO_URI = os.getenv("MONGO_URI")
