@@ -2,21 +2,14 @@
 fastapi
 uvicorn
 
-# MongoDB
-pymongo
-
 # Environment Variables
 python-dotenv
 
-# Password Hashing
-bcrypt
-
-
 # Request Validation
 pydantic
-email-validator
 
 # Resume Parsing
+langchain_community
 pymupdf
 
 # Groq API
@@ -34,12 +27,8 @@ requests
 # Audio Recording (for Streamlit)
 streamlit-mic-recorder
 
-# for continues login for the particular user for that session
-streamlit-cookies-manager 
-
-# Langchain
-langchain_community
+# for continuing session in Streamlit
+streamlit-cookies-manager
 
 # for text to speech
-pyttsx3   # this speaks on backend
-gtts # this is used for the frontend to speak
+gtts

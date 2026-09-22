@@ -1,19 +1,14 @@
-from backend.config import db
+# In-memory session store
+# -------------------------------------------------------------------
+# All data lives here in RAM.  When the server process exits (Render
+# restarts, tab closes, etc.) everything is wiped automatically.
+# No database, no persistence — a session ends when the server ends.
+# -------------------------------------------------------------------
+
 from datetime import datetime
 
-# Users collection
-users_collection = db["users"]
+# { session_id: {"name": str, "created_at": datetime} }
+sessions: dict = {}
 
-# Interviews collection
-interviews_collection = db["interviews"]
-
-
-def save_interview(user_id: str, answers: list, difficulty: str):
-    interview_doc = {
-        "user_id": user_id,
-        "difficulty": difficulty,
-        "answers": answers,
-        "created_at": datetime.utcnow()
-    }
-    result = interviews_collection.insert_one(interview_doc)
-    return str(result.inserted_id)
+# { session_id: [interview_doc, ...] }
+interviews: dict = {}
