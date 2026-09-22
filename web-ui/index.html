@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Articulate.AI — AI Mock Interview Platform</title>
+  <meta name="description" content="Articulate.AI is an AI-powered mock interview platform. Upload your resume, answer questions with your voice, and get AI-scored feedback instantly." />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- FontAwesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ========== ANIMATED BACKGROUND ========== -->
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ========== AUTH SCREEN ========== -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-container glass-card">
+      <div class="logo-block">
+        <div class="logo-icon"><i class="fa-solid fa-microphone-lines"></i></div>
+        <h1 class="logo-text">Articulate<span class="accent">.AI</span></h1>
+        <p class="logo-sub">AI-Powered Mock Interview Platform</p>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="tab-bar" role="tablist">
+        <button class="tab-btn active" id="tab-login-btn" role="tab" aria-selected="true" onclick="switchAuthTab('login')">Login</button>
+        <button class="tab-btn" id="tab-signup-btn" role="tab" aria-selected="false" onclick="switchAuthTab('signup')">Sign Up</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label for="login-email"><i class="fa-solid fa-envelope"></i> Email</label>
+          <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
+        </div>
+        <div id="login-error" class="form-error hidden"></div>
+        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+          <span class="btn-text">Login</span>
+          <span class="btn-spinner hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+        </button>
+      </form>
+
+      <!-- Signup Form -->
+      <form id="signup-form" class="auth-form" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label for="signup-username"><i class="fa-solid fa-user"></i> Username</label>
+          <input type="text" id="signup-username" placeholder="Your name" required autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="signup-email"><i class="fa-solid fa-envelope"></i> Email</label>
+          <input type="email" id="signup-email" placeholder="you@example.com" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="signup-password"><i class="fa-solid fa-lock"></i> Password</label>
+          <input type="password" id="signup-password" placeholder="Min 6 characters" required autocomplete="new-password" minlength="6" />
+        </div>
+        <div id="signup-error" class="form-error hidden"></div>
+        <div id="signup-success" class="form-success hidden"></div>
+        <button type="submit" class="btn btn-primary btn-full" id="signup-btn">
+          <span class="btn-text">Create Account</span>
+          <span class="btn-spinner hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========== MAIN APP SCREEN ========== -->
+  <div id="app-screen" class="screen">
+
+    <!-- Top Navigation -->
+    <nav class="navbar glass-nav">
+      <div class="nav-brand">
+        <i class="fa-solid fa-microphone-lines"></i>
+        <span>Articulate<span class="accent">.AI</span></span>
+      </div>
+      <div class="nav-tabs">
+        <button class="nav-tab active" id="nav-interview" onclick="switchPage('interview')">
+          <i class="fa-solid fa-comments"></i> Interview
+        </button>
+        <button class="nav-tab" id="nav-reports" onclick="switchPage('reports')">
+          <i class="fa-solid fa-chart-bar"></i> My Reports
+        </button>
+      </div>
+      <div class="nav-user">
+        <span id="nav-username" class="user-badge"><i class="fa-solid fa-circle-user"></i> <span id="nav-username-text">User</span></span>
+        <button class="btn btn-ghost btn-sm" onclick="handleLogout()" title="Logout">
+          <i class="fa-solid fa-right-from-bracket"></i>
+        </button>
+        <button class="btn btn-danger btn-sm" onclick="handleDeleteAccount()" title="Delete Account">
+          <i class="fa-solid fa-trash"></i>
+        </button>
+      </div>
+    </nav>
+
+    <!-- ===== INTERVIEW PAGE ===== -->
+    <div id="page-interview" class="page active">
+      <div class="page-content">
+
+        <!-- Step 1: Resume Upload -->
+        <section id="section-resume" class="section-card glass-card">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-file-pdf"></i></div>
+            <div>
+              <h2>Upload Your Resume</h2>
+              <p class="section-sub">We'll generate personalized interview questions from your resume</p>
+            </div>
+          </div>
+          <div id="resume-upload-area" class="upload-area" onclick="document.getElementById('resume-file').click()" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+            <p class="upload-text">Click or drag and drop your PDF resume here</p>
+            <p class="upload-sub">PDF files only</p>
+            <input type="file" id="resume-file" accept=".pdf" style="display:none" onchange="handleFileSelect(event)" />
+          </div>
+          <div id="file-selected" class="file-selected hidden">
+            <i class="fa-solid fa-file-pdf file-icon"></i>
+            <span id="file-name"></span>
+            <button class="btn btn-ghost btn-sm" onclick="clearFile()"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+          <button class="btn btn-primary btn-full" id="process-resume-btn" onclick="processResume()" disabled>
+            <span class="btn-text"><i class="fa-solid fa-gears"></i> Process Resume</span>
+            <span class="btn-spinner hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+          </button>
+          <div id="resume-status" class="status-msg hidden"></div>
+        </section>
+
+        <!-- Step 2: Interview Settings -->
+        <section id="section-settings" class="section-card glass-card locked">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-sliders"></i></div>
+            <div>
+              <h2>Interview Settings</h2>
+              <p class="section-sub">Customize your interview experience</p>
+            </div>
+            <div id="resume-done-badge" class="badge badge-success hidden"><i class="fa-solid fa-check"></i> Resume ready</div>
+          </div>
+
+          <div class="settings-grid">
+            <div class="form-group">
+              <label for="difficulty-select"><i class="fa-solid fa-gauge-high"></i> Difficulty</label>
+              <div class="select-wrapper">
+                <select id="difficulty-select">
+                  <option value="easy">Easy</option>
+                  <option value="medium" selected>Medium</option>
+                  <option value="hard">Hard</option>
+                </select>
+                <i class="fa-solid fa-chevron-down select-arrow"></i>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="num-questions"><i class="fa-solid fa-list-ol"></i> Questions: <span id="num-questions-val">8</span></label>
+              <input type="range" id="num-questions" min="5" max="15" value="8" oninput="document.getElementById('num-questions-val').textContent = this.value" class="range-input" />
+              <div class="range-labels"><span>5</span><span>15</span></div>
+            </div>
+          </div>
+
+          <button class="btn btn-primary btn-full" id="generate-btn" onclick="generateQuestions()" disabled>
+            <span class="btn-text"><i class="fa-solid fa-bolt"></i> Generate Questions</span>
+            <span class="btn-spinner hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
+          </button>
+          <div id="generate-status" class="status-msg hidden"></div>
+        </section>
+
+        <!-- Step 3: Interview Screen -->
+        <section id="section-interview" class="section-card glass-card hidden">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-microphone"></i></div>
+            <div>
+              <h2>Live Interview</h2>
+              <p class="section-sub" id="interview-subtitle">Question <span id="q-current">1</span> of <span id="q-total">10</span></p>
+            </div>
+          </div>
+
+          <!-- Progress bar -->
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill" id="progress-bar" style="width:0%"></div>
+          </div>
+
+          <!-- Question card -->
+          <div class="question-card" id="question-card">
+            <div class="question-number" id="question-number">Q1</div>
+            <p class="question-text" id="question-text">Loading question...</p>
+            <button class="btn btn-ghost btn-sm speak-btn" onclick="speakQuestion()" title="Speak question">
+              <i class="fa-solid fa-volume-high"></i> Hear Question
+            </button>
+          </div>
+
+          <!-- Recording section -->
+          <div class="recorder-section">
+            <button class="record-btn" id="record-btn" onclick="toggleRecording()">
+              <div class="record-icon-wrap">
+                <i class="fa-solid fa-microphone record-icon" id="record-icon"></i>
+                <div class="record-pulse" id="record-pulse"></div>
+              </div>
+              <span id="record-label">Start Recording</span>
+            </button>
+            <p class="recorder-hint" id="recorder-hint">Click to start recording your answer</p>
+          </div>
+
+          <!-- Transcription result -->
+          <div id="transcription-area" class="transcription-area hidden">
+            <div class="transcription-header">
+              <i class="fa-solid fa-quote-left"></i> Your Answer
+            </div>
+            <p id="transcription-text" class="transcription-text"></p>
+          </div>
+
+          <!-- Scoring result -->
+          <div id="score-area" class="score-area hidden">
+            <div id="verdict-badge" class="verdict-badge"></div>
+            <p id="score-reason" class="score-reason"></p>
+            <div id="confidence-area" class="confidence-area hidden">
+              <span class="confidence-label"><i class="fa-solid fa-bullseye"></i> Confidence Score</span>
+              <div class="confidence-bar-track">
+                <div class="confidence-bar-fill" id="confidence-bar"></div>
+              </div>
+              <span class="confidence-val" id="confidence-val"></span>
+            </div>
+          </div>
+
+          <!-- Navigation -->
+          <div id="next-btn-wrap" class="next-btn-wrap hidden">
+            <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">
+              Next Question <i class="fa-solid fa-arrow-right"></i>
+            </button>
+          </div>
+
+          <!-- Spinner overlays -->
+          <div id="transcribe-spinner" class="overlay-spinner hidden">
+            <i class="fa-solid fa-spinner fa-spin"></i> Transcribing...
+          </div>
+          <div id="score-spinner" class="overlay-spinner hidden">
+            <i class="fa-solid fa-spinner fa-spin"></i> Scoring answer...
+          </div>
+        </section>
+
+        <!-- Step 4: Interview Complete -->
+        <section id="section-complete" class="section-card glass-card hidden">
+          <div class="complete-hero">
+            <div class="complete-icon"><i class="fa-solid fa-trophy"></i></div>
+            <h2>Interview Complete!</h2>
+            <p>Great job! Here is your performance summary.</p>
+          </div>
+          <div id="summary-stats" class="summary-stats"></div>
+          <div id="summary-list" class="summary-list"></div>
+          <button class="btn btn-primary btn-full" onclick="startNewInterview()">
+            <i class="fa-solid fa-rotate-right"></i> Start New Interview
+          </button>
+        </section>
+
+      </div>
+    </div>
+
+    <!-- ===== REPORTS PAGE ===== -->
+    <div id="page-reports" class="page">
+      <div class="page-content">
+        <section class="section-card glass-card">
+          <div class="section-header">
+            <div class="section-icon"><i class="fa-solid fa-chart-bar"></i></div>
+            <div>
+              <h2>My Interview Reports</h2>
+              <p class="section-sub">Review your past interview sessions</p>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="loadReports()" title="Refresh">
+              <i class="fa-solid fa-rotate-right"></i>
+            </button>
+          </div>
+
+          <div id="reports-loading" class="center-msg">
+            <i class="fa-solid fa-spinner fa-spin"></i> Loading reports...
+          </div>
+          <div id="reports-empty" class="center-msg hidden">
+            <i class="fa-solid fa-inbox" style="font-size:2rem;opacity:.4"></i>
+            <p>No interviews yet. Go complete one!</p>
+          </div>
+          <div id="reports-list" class="reports-list hidden"></div>
+        </section>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== GLOBAL TOAST ========== -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
