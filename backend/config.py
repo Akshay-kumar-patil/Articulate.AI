@@ -19,7 +19,15 @@ class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
 
 
+# connectTimeoutMS / serverSelectionTimeoutMS — don't block at import time.
+# PyMongo will only actually connect when the first real DB operation happens.
+client = MongoClient(
+    Config.MONGO_URI,
+    serverSelectionTimeoutMS=10000,   # 10s to select a server
+    connectTimeoutMS=10000,           # 10s to establish TCP connection
+    socketTimeoutMS=20000,            # 20s for any single socket operation
+    tls=True,
+    tlsAllowInvalidCertificates=False,
+)
 
-client = MongoClient(Config.MONGO_URI)
-
-db = client[Config.DB_NAME]
+db = client[Config.DB_NAME]
