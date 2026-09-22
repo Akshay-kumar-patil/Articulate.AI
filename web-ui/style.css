@@ -976,3 +976,17 @@ body {
 @media (max-width: 480px) {
   .nav-tabs .nav-tab span { display: none; }
 }
+
+/* ---------- Session Notice ---------- */
+.session-notice {
+  background: rgba(124, 109, 240, 0.1);
+  border: 1px solid rgba(124, 109, 240, 0.3);
+  border-radius: var(--radius-sm);
+  padding: .75rem 1rem;
+  font-size: .9rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+.session-notice i { color: var(--accent-light); margin-right: .35rem; }

@@ -2,6 +2,8 @@
    Articulate.AI — Web UI Application Logic
    Vanilla JS SPA for Netlify deployment
    Talks to FastAPI backend on Render
+   Session-based: no login, no database.
+   Data lives in RAM — cleared on server restart.
    ============================================= */
 
 'use strict';
@@ -13,9 +15,11 @@ const API_URL = 'https://articulate-ai.onrender.com';
 
 // ───────────────────────────────────────────────
 // APPLICATION STATE
+// session_id: UUID returned by /auth/start-session
+// Stored in sessionStorage (cleared on tab close)
 // ───────────────────────────────────────────────
 const state = {
-  userId: null,
+  sessionId: null,
   username: null,
   resumeInfo: null,
   questions: [],
@@ -34,26 +38,28 @@ const state = {
 // INITIALIZATION
 // ───────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-  const savedUserId = localStorage.getItem('articulate_user_id');
-  const savedUsername = localStorage.getItem('articulate_username');
+  // sessionStorage is cleared automatically when the tab is closed
+  const savedId   = sessionStorage.getItem('articulate_session_id');
+  const savedName = sessionStorage.getItem('articulate_username');
 
-  if (savedUserId) {
-    // Verify token is still valid
-    fetch(`${API_URL}/auth/verify/${savedUserId}`)
+  if (savedId && savedName) {
+    // Verify the session is still alive on the server
+    fetch(`${API_URL}/auth/verify/${savedId}`)
       .then(r => {
         if (r.ok) {
-          state.userId = savedUserId;
-          state.username = savedUsername || 'User';
+          state.sessionId = savedId;
+          state.username  = savedName;
           showApp();
         } else {
+          // Session expired (server restarted) — ask name again
           clearSession();
           showAuth();
         }
       })
       .catch(() => {
-        // If backend is sleeping (Render free tier), show app anyway
-        state.userId = savedUserId;
-        state.username = savedUsername || 'User';
+        // Backend sleeping on Render free tier — still show app
+        state.sessionId = savedId;
+        state.username  = savedName;
         showApp();
       });
   } else {
@@ -77,149 +83,65 @@ function showApp() {
 }
 
 function clearSession() {
-  localStorage.removeItem('articulate_user_id');
-  localStorage.removeItem('articulate_username');
-  state.userId = null;
-  state.username = null;
+  sessionStorage.removeItem('articulate_session_id');
+  sessionStorage.removeItem('articulate_username');
+  state.sessionId = null;
+  state.username  = null;
 }
 
 // ───────────────────────────────────────────────
-// AUTH TAB SWITCHER
+// SESSION — START (replaces login/signup)
 // ───────────────────────────────────────────────
-function switchAuthTab(tab) {
-  const loginForm  = document.getElementById('login-form');
-  const signupForm = document.getElementById('signup-form');
-  const loginBtn   = document.getElementById('tab-login-btn');
-  const signupBtn  = document.getElementById('tab-signup-btn');
-
-  if (tab === 'login') {
-    loginForm.classList.add('active');
-    signupForm.classList.remove('active');
-    loginBtn.classList.add('active');
-    signupBtn.classList.remove('active');
-    loginBtn.setAttribute('aria-selected', 'true');
-    signupBtn.setAttribute('aria-selected', 'false');
-  } else {
-    signupForm.classList.add('active');
-    loginForm.classList.remove('active');
-    signupBtn.classList.add('active');
-    loginBtn.classList.remove('active');
-    signupBtn.setAttribute('aria-selected', 'true');
-    loginBtn.setAttribute('aria-selected', 'false');
-  }
-}
-
-// ───────────────────────────────────────────────
-// AUTH — LOGIN
-// ───────────────────────────────────────────────
-async function handleLogin(e) {
+async function handleStartSession(e) {
   e.preventDefault();
-  const email    = document.getElementById('login-email').value.trim();
-  const password = document.getElementById('login-password').value;
-  const errEl    = document.getElementById('login-error');
-  const btn      = document.getElementById('login-btn');
+  const name  = document.getElementById('session-name').value.trim();
+  const errEl = document.getElementById('session-error');
+  const btn   = document.getElementById('session-btn');
 
   setLoading(btn, true);
   hideEl(errEl);
 
   try {
-    const res = await fetch(`${API_URL}/auth/login`, {
+    const res = await fetch(`${API_URL}/auth/start-session`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ name }),
     });
 
     if (res.ok) {
       const data = await res.json();
-      state.userId   = data.user_id;
-      state.username = data.username;
-      localStorage.setItem('articulate_user_id', data.user_id);
-      localStorage.setItem('articulate_username', data.username);
+      state.sessionId = data.session_id;
+      state.username  = data.name;
+      // Use sessionStorage — auto-wiped when tab/browser closes
+      sessionStorage.setItem('articulate_session_id', data.session_id);
+      sessionStorage.setItem('articulate_username', data.name);
       showApp();
     } else {
       const err = await res.json();
       showEl(errEl);
-      errEl.textContent = err.detail || 'Invalid email or password';
+      errEl.textContent = err.detail || 'Could not start session. Try again.';
     }
-  } catch (error) {
+  } catch {
     showEl(errEl);
-    errEl.textContent = 'Network error. Please try again.';
+    errEl.textContent = 'Cannot reach server. Please try again in a moment.';
   } finally {
     setLoading(btn, false);
   }
 }
 
 // ───────────────────────────────────────────────
-// AUTH — SIGNUP
-// ───────────────────────────────────────────────
-async function handleSignup(e) {
-  e.preventDefault();
-  const username = document.getElementById('signup-username').value.trim();
-  const email    = document.getElementById('signup-email').value.trim();
-  const password = document.getElementById('signup-password').value;
-  const errEl    = document.getElementById('signup-error');
-  const sucEl    = document.getElementById('signup-success');
-  const btn      = document.getElementById('signup-btn');
-
-  setLoading(btn, true);
-  hideEl(errEl);
-  hideEl(sucEl);
-
-  try {
-    const res = await fetch(`${API_URL}/auth/signup`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, email, password }),
-    });
-
-    if (res.ok) {
-      showEl(sucEl);
-      sucEl.textContent = 'Account created! Please login.';
-      document.getElementById('signup-form').reset();
-      setTimeout(() => switchAuthTab('login'), 1500);
-    } else {
-      const err = await res.json();
-      showEl(errEl);
-      errEl.textContent = err.detail || 'Signup failed. Try again.';
-    }
-  } catch (error) {
-    showEl(errEl);
-    errEl.textContent = 'Network error. Please try again.';
-  } finally {
-    setLoading(btn, false);
-  }
-}
-
-// ───────────────────────────────────────────────
-// AUTH — LOGOUT
+// SESSION — END (replaces logout)
 // ───────────────────────────────────────────────
 function handleLogout() {
-  if (!confirm('Are you sure you want to logout?')) return;
+  if (!confirm('End your session? All interview data for this session will be cleared.')) return;
+  // Tell backend to wipe this session's data
+  if (state.sessionId) {
+    fetch(`${API_URL}/auth/end-session/${state.sessionId}`, { method: 'DELETE' }).catch(() => {});
+  }
   clearSession();
   resetInterviewState();
   showAuth();
-  showToast('Logged out successfully');
-}
-
-// ───────────────────────────────────────────────
-// AUTH — DELETE ACCOUNT
-// ───────────────────────────────────────────────
-async function handleDeleteAccount() {
-  if (!confirm('Permanently delete your account and ALL interview history? This cannot be undone.')) return;
-
-  try {
-    const res = await fetch(`${API_URL}/analytics/delete-user/${state.userId}`, { method: 'DELETE' });
-    if (res.ok) {
-      clearSession();
-      resetInterviewState();
-      showAuth();
-      showToast('Account deleted permanently');
-    } else {
-      showToast('Failed to delete account. Try again.');
-    }
-  } catch {
-    showToast('Network error. Try again.');
-  }
+  showToast('Session ended. See you next time!');
 }
 
 // ───────────────────────────────────────────────
@@ -650,21 +572,21 @@ async function finishInterview() {
   hideEl(document.getElementById('section-interview'));
   showEl(document.getElementById('section-complete'));
 
-  // Auto-save
-  if (!state.saved && state.answers.length > 0) {
+  // Auto-save to in-memory session store on backend
+  if (!state.saved && state.answers.length > 0 && state.sessionId) {
     try {
       const res = await fetch(`${API_URL}/analytics/save-interview`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          user_id: state.userId,
+          session_id: state.sessionId,
           difficulty: state.difficulty,
           answers: state.answers,
         }),
       });
       if (res.ok) {
         state.saved = true;
-        showToast('Interview saved to your report history!');
+        showToast('Interview saved to your session reports!');
       }
     } catch {
       showToast('Could not save interview. Check your connection.');
@@ -758,8 +680,15 @@ async function loadReports() {
   hideEl(listEl);
   listEl.innerHTML = '';
 
+  if (!state.sessionId) {
+    hideEl(loadingEl);
+    showEl(emptyEl);
+    document.querySelector('#reports-empty p').textContent = 'No active session.';
+    return;
+  }
+
   try {
-    const res = await fetch(`${API_URL}/analytics/get-report/${state.userId}`);
+    const res = await fetch(`${API_URL}/analytics/get-report/${state.sessionId}`);
     if (!res.ok) throw new Error('Failed to load');
 
     const data       = await res.json();
@@ -769,6 +698,7 @@ async function loadReports() {
 
     if (interviews.length === 0) {
       showEl(emptyEl);
+      document.querySelector('#reports-empty p').textContent = 'No interviews yet this session. Go complete one!';
     } else {
       interviews.reverse(); // newest first
       listEl.innerHTML = interviews.map(renderReportCard).join('');
@@ -788,7 +718,7 @@ function renderReportCard(interview) {
   const wrong    = answers.filter(a => a.verdict === 'wrong').length;
   const date     = interview.created_at || 'Unknown date';
   const diff     = (interview.difficulty || 'unknown').toUpperCase();
-  const id       = interview._id;
+  const id       = interview.interview_id;
 
   const icons = { correct: '✅', partial: '⚠️', wrong: '❌' };
 
@@ -832,10 +762,10 @@ function toggleReport(id) {
 }
 
 async function deleteInterview(id) {
-  if (!confirm('Delete this interview permanently?')) return;
+  if (!confirm('Delete this interview from your session?')) return;
 
   try {
-    const res = await fetch(`${API_URL}/analytics/delete-session/${id}`, { method: 'DELETE' });
+    const res = await fetch(`${API_URL}/analytics/delete-interview/${state.sessionId}/${id}`, { method: 'DELETE' });
     if (res.ok) {
       document.getElementById(`report-${id}`)?.remove();
       showToast('Interview deleted');
@@ -843,7 +773,7 @@ async function deleteInterview(id) {
       if (!document.querySelector('.report-card')) {
         hideEl(document.getElementById('reports-list'));
         showEl(document.getElementById('reports-empty'));
-        document.querySelector('#reports-empty p').textContent = 'No interviews yet. Go complete one!';
+        document.querySelector('#reports-empty p').textContent = 'No interviews yet this session. Go complete one!';
       }
     } else {
       showToast('Failed to delete interview');

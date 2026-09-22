@@ -34,47 +34,21 @@
         <p class="logo-sub">AI-Powered Mock Interview Platform</p>
       </div>
 
-      <!-- Tab switcher -->
-      <div class="tab-bar" role="tablist">
-        <button class="tab-btn active" id="tab-login-btn" role="tab" aria-selected="true" onclick="switchAuthTab('login')">Login</button>
-        <button class="tab-btn" id="tab-signup-btn" role="tab" aria-selected="false" onclick="switchAuthTab('signup')">Sign Up</button>
-      </div>
+      <p class="session-notice">
+        <i class="fa-solid fa-circle-info"></i>
+        No account needed — just enter your name to start.<br/>
+        <span style="font-size:.82rem;opacity:.7">Your session data is temporary and cleared when you leave.</span>
+      </p>
 
-      <!-- Login Form -->
-      <form id="login-form" class="auth-form active" onsubmit="handleLogin(event)">
+      <!-- Name-only session form -->
+      <form id="session-form" class="auth-form active" onsubmit="handleStartSession(event)">
         <div class="form-group">
-          <label for="login-email"><i class="fa-solid fa-envelope"></i> Email</label>
-          <input type="email" id="login-email" placeholder="you@example.com" required autocomplete="email" />
+          <label for="session-name"><i class="fa-solid fa-user"></i> Your Name</label>
+          <input type="text" id="session-name" placeholder="e.g. Akshay" required autocomplete="name" minlength="2" maxlength="50" />
         </div>
-        <div class="form-group">
-          <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
-          <input type="password" id="login-password" placeholder="••••••••" required autocomplete="current-password" />
-        </div>
-        <div id="login-error" class="form-error hidden"></div>
-        <button type="submit" class="btn btn-primary btn-full" id="login-btn">
-          <span class="btn-text">Login</span>
-          <span class="btn-spinner hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
-        </button>
-      </form>
-
-      <!-- Signup Form -->
-      <form id="signup-form" class="auth-form" onsubmit="handleSignup(event)">
-        <div class="form-group">
-          <label for="signup-username"><i class="fa-solid fa-user"></i> Username</label>
-          <input type="text" id="signup-username" placeholder="Your name" required autocomplete="name" />
-        </div>
-        <div class="form-group">
-          <label for="signup-email"><i class="fa-solid fa-envelope"></i> Email</label>
-          <input type="email" id="signup-email" placeholder="you@example.com" required autocomplete="email" />
-        </div>
-        <div class="form-group">
-          <label for="signup-password"><i class="fa-solid fa-lock"></i> Password</label>
-          <input type="password" id="signup-password" placeholder="Min 6 characters" required autocomplete="new-password" minlength="6" />
-        </div>
-        <div id="signup-error" class="form-error hidden"></div>
-        <div id="signup-success" class="form-success hidden"></div>
-        <button type="submit" class="btn btn-primary btn-full" id="signup-btn">
-          <span class="btn-text">Create Account</span>
+        <div id="session-error" class="form-error hidden"></div>
+        <button type="submit" class="btn btn-primary btn-full" id="session-btn">
+          <span class="btn-text"><i class="fa-solid fa-rocket"></i> Start Interview</span>
           <span class="btn-spinner hidden"><i class="fa-solid fa-spinner fa-spin"></i></span>
         </button>
       </form>
@@ -100,11 +74,8 @@
       </div>
       <div class="nav-user">
         <span id="nav-username" class="user-badge"><i class="fa-solid fa-circle-user"></i> <span id="nav-username-text">User</span></span>
-        <button class="btn btn-ghost btn-sm" onclick="handleLogout()" title="Logout">
-          <i class="fa-solid fa-right-from-bracket"></i>
-        </button>
-        <button class="btn btn-danger btn-sm" onclick="handleDeleteAccount()" title="Delete Account">
-          <i class="fa-solid fa-trash"></i>
+        <button class="btn btn-ghost btn-sm" onclick="handleLogout()" title="End session">
+          <i class="fa-solid fa-right-from-bracket"></i> End Session
         </button>
       </div>
     </nav>
