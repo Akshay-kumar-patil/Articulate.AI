@@ -9,3 +9,6 @@ __pycache__/
 .vscode/
 
 *.pyc
+
+# Streamlit local secrets — never commit this
+.streamlit/secrets.toml
