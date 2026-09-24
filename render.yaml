@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: articulate-ai
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false   # set manually in Render dashboard
+      - key: SECRET_KEY
+        sync: false   # set manually in Render dashboard
+    plan: free
