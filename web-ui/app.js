@@ -11,7 +11,7 @@
 // ───────────────────────────────────────────────
 // CONFIGURATION
 // ───────────────────────────────────────────────
-const API_URL = 'https://articulate-ai.onrender.com';
+const API_URL = 'https://articulate-ai-wsy3.onrender.com';
 
 // ───────────────────────────────────────────────
 // APPLICATION STATE

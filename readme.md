@@ -135,7 +135,7 @@ streamlit run frontend/app.py
 
 ## 🌐 Deployment
 
-- **Backend** — deployed on [Render](https://articulate-ai.onrender.com/)
+- **Backend** — deployed on [Render](https://articulate-ai-wsy3.onrender.com/)
 - **Frontend** — deployed on [Streamlit Cloud](https://articulateai-akki.streamlit.app/)
 - **Database** — MongoDB Atlas (free tier)
 
