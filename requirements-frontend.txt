@@ -1,0 +1,8 @@
+# Streamlit frontend dependencies
+# Install with: pip install -r requirements-frontend.txt
+# Do NOT add these to requirements.txt (used by Render backend only)
+
+streamlit
+streamlit-mic-recorder
+gtts
+requests
