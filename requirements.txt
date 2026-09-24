@@ -1,34 +1,30 @@
-# FastAPI Backend
-fastapi
-uvicorn
+# ─────────────────────────────────────────────
+# Backend dependencies (Render / FastAPI server)
+# ─────────────────────────────────────────────
 
-# Environment Variables
+# FastAPI + server
+fastapi
+uvicorn[standard]
+
+# Environment variables
 python-dotenv
 
-# Request Validation
+# Request validation / serialisation
 pydantic
 
-# Resume Parsing
+# Resume parsing — PDF loader
 langchain_community
 pymupdf
 
-# Groq API
+# Groq SDK (LLM + Whisper speech-to-text)
 groq
 
-# File Uploads
+# File uploads (multipart/form-data)
 python-multipart
 
-# Streamlit Frontend
-streamlit
-
-# HTTP Requests (Frontend -> Backend)
-requests
-
-# Audio Recording (for Streamlit)
-streamlit-mic-recorder
-
-# for continuing session in Streamlit
-streamlit-cookies-manager
-
-# for text to speech
-gtts
+# ─────────────────────────────────────────────
+# Streamlit frontend dependencies
+# Install these separately when running the Streamlit UI:
+#   pip install streamlit streamlit-mic-recorder streamlit-cookies-manager gtts requests
+# They are intentionally excluded here so Render's build is lean and fast.
+# ─────────────────────────────────────────────
